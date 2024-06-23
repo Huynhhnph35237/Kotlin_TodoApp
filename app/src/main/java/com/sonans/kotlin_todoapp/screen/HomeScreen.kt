@@ -10,12 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +32,7 @@ import retrofit2.Response
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class) // Accept the experimental API
 @Composable
 fun HomeScreen(navController: NavController) {
     val scrollState = rememberScrollState()
@@ -47,6 +43,7 @@ fun HomeScreen(navController: NavController) {
     var searchText by remember { mutableStateOf(TextFieldValue()) } // State for storing search text
 
     LaunchedEffect(Unit) {
+        // nếu userId không phải là null, nó sẽ gọi API để lấy danh sách các công việc từ máy chủ và lọc ra các công việc của người dùng hiện tại
         if (userId != null) {
             coroutineScope.launch(Dispatchers.IO) {
                 val retrofitService = RetrofitBuilder.getClient().create(ApiService::class.java)
@@ -62,6 +59,7 @@ fun HomeScreen(navController: NavController) {
                                 todos.value = filteredTodos
                             } else {
                                 // Handle failed response
+                                //Nếu không có userId, sẽ hiển thị thông báo lỗi.
                             }
                         } else {
                             // Handle unsuccessful response
@@ -78,15 +76,25 @@ fun HomeScreen(navController: NavController) {
         }
     }
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFF5F9FF))) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F9FF))
+            .padding(16.dp)
+    ) {
         // Search TextField
         TextField(
             value = searchText,
             onValueChange = { searchText = it },
             label = { Text("Search Todo") }, // Label for TextField
             modifier = Modifier
-                .padding(8.dp)
                 .fillMaxWidth()
+                .padding(bottom = 8.dp)
+                .background(Color.White, RoundedCornerShape(8.dp)),
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            )
         )
 
         LazyColumn(modifier = Modifier.weight(1f)) {
@@ -107,7 +115,7 @@ fun HomeScreen(navController: NavController) {
             onClick = { navController.navigate("add") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 40.dp, start = 10.dp, end = 10.dp),
+                .padding(top = 16.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF7392FF)
             )
@@ -118,11 +126,14 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
+
+// lấy user_id từ SharedPreferences
 fun getUserId(context: Context): String? {
     val sharedPreferences: SharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     return sharedPreferences.getString("user_id", null)
 }
 
+@OptIn(ExperimentalMaterial3Api::class) // Accept the experimental API
 @Composable
 fun ItemTodo(title: String, status: Int, idTodo: String, modifier: Modifier = Modifier, navController: NavController) {
     var isChecked by remember { mutableStateOf(status == 1) }
@@ -131,7 +142,8 @@ fun ItemTodo(title: String, status: Int, idTodo: String, modifier: Modifier = Mo
 
     Row(
         modifier = modifier
-            .fillMaxWidth().clickable { navController.navigate("update/${idTodo}") }
+            .fillMaxWidth()
+            .clickable { navController.navigate("update/${idTodo}") }
             .padding(8.dp)
             .background(if (isChecked) Color(0xFFCADFFF) else Color.White, RoundedCornerShape(8.dp)), // Rounded corners and background color based on isChecked
         verticalAlignment = Alignment.CenterVertically
@@ -140,7 +152,8 @@ fun ItemTodo(title: String, status: Int, idTodo: String, modifier: Modifier = Mo
         Text(
             text = title,
             color = if (isChecked) Color.Blue else Color.Black,
-            modifier = Modifier.padding(10.dp, 0.dp)
+            modifier = Modifier
+                .padding(10.dp, 0.dp)
                 .weight(1f)
                 .padding(start = 8.dp),
             maxLines = 1, // Display only on one line

@@ -38,6 +38,7 @@ fun UpdateTodoScreen(navController: NavController, todoId: String?) {
     var content by remember { mutableStateOf("") }
 
     LaunchedEffect(todoId) {
+   // nếu todoId kh phải là null, nó sẽ gọi API để lấy thông tin chi tiết của công việc & cập nhật các trạng thái title và content.
         if (todoId != null) {
             coroutineScope.launch(Dispatchers.IO) {
                 val retrofitService = RetrofitBuilder.getClient().create(ApiService::class.java)

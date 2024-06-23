@@ -49,6 +49,7 @@ fun AddTodoScreen(navController: NavController) {
 
         Button(
             onClick = {
+                //sử dụng hàm getUserId
                 if (userId != null) {
                     val newTodo = Todo(
                         _id = "",
@@ -76,6 +77,10 @@ fun AddTodoScreen(navController: NavController) {
     }
 }
 
+
+// hàm addTodoToServer gửi todo mới lên máy chủ = cách use ApiService.
+// phương thức addTodo trên ApiService, truyền đối tượng Todo mới.
+// addTodo là một cuộc gọi bất đồng bộ => hàm sử dụng phương thức enqueue để xử lý phản hồi
 fun addTodoToServer(todo: Todo, navController: NavController) {
     val retrofitService = RetrofitBuilder.getClient().create(ApiService::class.java)
     retrofitService.addTodo(todo).enqueue(object : Callback<ApiResponse<Todo>> {
