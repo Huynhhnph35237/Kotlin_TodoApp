@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Server_REstAPI" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Server" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Server/todoAPI" vcs="Git" />
   </component>
 </project>
